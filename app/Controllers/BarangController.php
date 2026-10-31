@@ -20,10 +20,18 @@ final class BarangController extends Controller
 
     public function index(): void
     {
+        $filters = $this->filters();
+        $result = $this->barang->paginate($filters, $this->currentPage());
+
         $this->view('barang/index', [
             'title' => 'Daftar Barang',
             'active' => 'barang',
-            'barang' => $this->barang->allWithKategori(),
+            'barang' => $result['items'],
+            'pagination' => $result,
+            'filters' => $filters,
+            'kategori' => $this->kategori->all(),
+            'stats' => $this->barang->stats(),
+            'lowStockThreshold' => Barang::STOK_MENIPIS,
         ]);
     }
 
@@ -60,6 +68,7 @@ final class BarangController extends Controller
         $this->barang->create($this->normalize($data));
 
         flash('success', 'Barang "' . $data['nama'] . '" berhasil ditambahkan.');
+        $this->flashLowStock($data['nama'], (int) $data['stok']);
         $this->redirect('/barang');
     }
 
@@ -102,6 +111,7 @@ final class BarangController extends Controller
         $this->barang->update($id, $this->normalize($data));
 
         flash('success', 'Barang "' . $data['nama'] . '" berhasil diperbarui.');
+        $this->flashLowStock($data['nama'], (int) $data['stok']);
         $this->redirect('/barang');
     }
 
@@ -114,6 +124,44 @@ final class BarangController extends Controller
 
         flash('success', 'Barang "' . $barang['nama'] . '" berhasil dihapus.');
         $this->redirect('/barang');
+    }
+
+    public function export(): void
+    {
+        $rows = $this->barang->allForExport($this->filters());
+        $filename = 'barang-' . date('Y-m-d') . '.csv';
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-store');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        $output = fopen('php://output', 'wb');
+
+        if ($output === false) {
+            return;
+        }
+
+        fwrite($output, "\xEF\xBB\xBF");
+        fputcsv($output, ['ID', 'Kode', 'Nama', 'Kategori', 'Stok', 'Harga', 'Nilai', 'Deskripsi', 'Dibuat'], ';');
+
+        foreach ($rows as $row) {
+            fputcsv($output, [
+                (int) $row['id'],
+                sprintf('BRG-%04d', (int) $row['id']),
+                $this->csvValue($row['nama']),
+                $this->csvValue($row['kategori_nama']),
+                (int) $row['stok'],
+                (float) $row['harga'],
+                (float) $row['stok'] * (float) $row['harga'],
+                $this->csvValue($row['deskripsi'] ?? ''),
+                (string) $row['created_at'],
+            ], ';');
+        }
+
+        fclose($output);
+        exit;
     }
 
     /**
@@ -224,6 +272,21 @@ final class BarangController extends Controller
         return $errors;
     }
 
+    private function flashLowStock(string $nama, int $stok): void
+    {
+        if ($stok === 0) {
+            flash('warning', 'Stok barang "' . $nama . '" habis. Segera lakukan restock.');
+            return;
+        }
+
+        if ($stok <= Barang::STOK_MENIPIS) {
+            flash(
+                'warning',
+                'Stok barang "' . $nama . '" menipis (' . $stok . '). Pertimbangkan untuk restock.'
+            );
+        }
+    }
+
     private function parseId(string $value): int
     {
         $id = filter_var($value, FILTER_VALIDATE_INT, [
@@ -249,5 +312,50 @@ final class BarangController extends Controller
         }
 
         return $barang;
+    }
+
+    /**
+     * @return array{q: string, kategori: int|null, status: string, sort: string, dir: string}
+     */
+    private function filters(): array
+    {
+        $kategori = filter_var($this->queryString('kategori'), FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+
+        $status = $this->queryString('status');
+        $sort = $this->queryString('sort', 'created_at');
+        $dir = strtoupper($this->queryString('dir', 'DESC'));
+
+        return [
+            'q' => $this->queryString('q'),
+            'kategori' => $kategori === false ? null : $kategori,
+            'status' => in_array($status, ['habis', 'menipis', 'aman', 'restock'], true) ? $status : '',
+            'sort' => in_array($sort, ['created_at', 'nama', 'stok', 'harga'], true) ? $sort : 'created_at',
+            'dir' => $dir === 'ASC' ? 'ASC' : 'DESC',
+        ];
+    }
+
+    private function currentPage(): int
+    {
+        $page = filter_var($this->queryString('page', '1'), FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+
+        return $page === false ? 1 : $page;
+    }
+
+    private function queryString(string $key, string $default = ''): string
+    {
+        $value = $_GET[$key] ?? $default;
+
+        return is_string($value) ? trim($value) : $default;
+    }
+
+    private function csvValue(mixed $value): string
+    {
+        $text = (string) $value;
+
+        return preg_match('/^[=+\-@]/', $text) === 1 ? "'" . $text : $text;
     }
 }

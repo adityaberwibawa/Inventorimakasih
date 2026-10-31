@@ -20,7 +20,7 @@ $tanpaKategori = $kategori === [];
     </div>
 <?php endif; ?>
 
-<form action="<?= e($formAction) ?>" method="post" class="space-y-5" novalidate>
+<form action="<?= e($formAction) ?>" method="post" class="space-y-5" novalidate data-submit-loading>
     <?php if (isset($old['id'])): ?>
         <input type="hidden" name="id" value="<?= (int) $old['id'] ?>">
     <?php endif; ?>
@@ -75,18 +75,32 @@ $tanpaKategori = $kategori === [];
             <label for="stok" class="mb-1.5 block text-sm font-semibold text-slate-700">
                 Stok <span class="text-rose-500" aria-hidden="true">*</span>
             </label>
-            <input
-                type="number"
-                id="stok"
-                name="stok"
-                value="<?= e($old['stok'] ?? '0') ?>"
-                min="0"
-                max="1000000"
-                step="1"
-                required
-                class="w-full rounded-lg border px-3.5 py-2.5 text-sm shadow-sm outline-none transition focus:ring-2 <?= $stokError !== null ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-100' : 'border-slate-300 focus:border-indigo-500 focus:ring-indigo-100' ?>"
-                <?= $stokError !== null ? 'aria-invalid="true" aria-describedby="stok-error"' : '' ?>
-            >
+            <div class="flex items-center gap-2">
+                <button type="button"
+                        data-stok-minus
+                        class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white text-lg font-semibold text-slate-600 transition hover:bg-slate-50"
+                        aria-label="Kurangi stok">
+                    &minus;
+                </button>
+                <input
+                    type="number"
+                    id="stok"
+                    name="stok"
+                    value="<?= e($old['stok'] ?? '0') ?>"
+                    min="0"
+                    max="1000000"
+                    step="1"
+                    required
+                    class="h-11 min-w-0 flex-1 rounded-lg border px-3.5 text-center text-sm shadow-sm outline-none transition focus:ring-2 <?= $stokError !== null ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-100' : 'border-slate-300 focus:border-indigo-500 focus:ring-indigo-100' ?>"
+                    <?= $stokError !== null ? 'aria-invalid="true" aria-describedby="stok-error"' : '' ?>
+                >
+                <button type="button"
+                        data-stok-plus
+                        class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white text-lg font-semibold text-slate-600 transition hover:bg-slate-50"
+                        aria-label="Tambah stok">
+                    +
+                </button>
+            </div>
             <?php if ($stokError !== null): ?>
                 <p id="stok-error" class="mt-1.5 text-sm text-rose-600"><?= e($stokError) ?></p>
             <?php endif; ?>
@@ -126,12 +140,18 @@ $tanpaKategori = $kategori === [];
             name="deskripsi"
             rows="4"
             maxlength="5000"
+            data-char-count
             class="w-full rounded-lg border px-3.5 py-2.5 text-sm shadow-sm outline-none transition focus:ring-2 <?= $deskripsiError !== null ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-100' : 'border-slate-300 focus:border-indigo-500 focus:ring-indigo-100' ?>"
             <?= $deskripsiError !== null ? 'aria-invalid="true" aria-describedby="deskripsi-error"' : '' ?>
         ><?= e($old['deskripsi'] ?? '') ?></textarea>
-        <?php if ($deskripsiError !== null): ?>
-            <p id="deskripsi-error" class="mt-1.5 text-sm text-rose-600"><?= e($deskripsiError) ?></p>
-        <?php endif; ?>
+        <div class="mt-1.5 flex items-center justify-between gap-3">
+            <?php if ($deskripsiError !== null): ?>
+                <p id="deskripsi-error" class="text-sm text-rose-600"><?= e($deskripsiError) ?></p>
+            <?php else: ?>
+                <span></span>
+            <?php endif; ?>
+            <p class="text-xs text-slate-400"><span data-char-output><?= mb_strlen((string) ($old['deskripsi'] ?? '')) ?></span>/5000</p>
+        </div>
     </div>
 
     <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">

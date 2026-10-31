@@ -47,6 +47,7 @@ $router->post('/barang/simpan', [BarangController::class, 'store']);
 $router->get('/barang/edit/{id}', [BarangController::class, 'edit']);
 $router->post('/barang/update', [BarangController::class, 'update']);
 $router->post('/barang/hapus', [BarangController::class, 'destroy']);
+$router->get('/barang/export', [BarangController::class, 'export']);
 
 // -------------------------------------------------------------------------
 // Rute Kategori (Anggota A)
