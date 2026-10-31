@@ -5,8 +5,8 @@ Berikut penyesuaian **PRD + Struktur Folder + Pembagian Tugas** untuk **2 orang*
 # PRODUCT REQUIREMENTS DOCUMENT (PRD)
 ## Inventorimakasih – Sistem Manajemen Inventaris Barang  
 
-**Versi:** 1.1  
-**Tanggal:** 30 Oktober 2026  
+**Versi:** 1.2  
+**Tanggal:** 31 Oktober 2026  
 **Jumlah Pengembang:** 2 Orang  
 **Matkul:** Pemrograman Web
 
@@ -33,9 +33,19 @@ Berikut penyesuaian **PRD + Struktur Folder + Pembagian Tugas** untuk **2 orang*
 - Hapus barang
 
 #### Fitur Pendukung
-- Flash message (sukses / error)
+- Flash message (sukses / error / warning)
 - Validasi input di Controller
 - Layout responsif sederhana (Tailwind)
+
+#### Fitur Tambahan (v1.2 — telah diimplementasikan)
+- Dashboard inventaris: total barang, total kategori, nilai stok, barang perlu restock
+- Pencarian nama/deskripsi/kategori (wildcard `%`/`_` di-escape)
+- Filter status stok (habis, menipis, aman, perlu restock) dan filter kategori
+- Sort kolom (whitelist) + pagination
+- Badge status stok otomatis + peringatan flash stok menipis/habis
+- Export CSV sesuai filter aktif (anti formula injection)
+- Proteksi CSRF pada semua form POST
+- Input harga menerima koma desimal (`15,5` → `15.50`)
 
 ---
 
@@ -73,6 +83,7 @@ CREATE TABLE barang (
 | GET    | `/barang/edit/{id}`     | Form edit barang       |
 | POST   | `/barang/update`        | Proses update barang   |
 | POST   | `/barang/hapus`         | Proses hapus barang    |
+| GET    | `/barang/export`        | Export CSV barang      |
 | GET    | `/kategori`             | Daftar kategori        |
 | GET    | `/kategori/tambah`      | Form tambah kategori   |
 | POST   | `/kategori/simpan`      | Proses simpan kategori |
@@ -88,6 +99,7 @@ CREATE TABLE barang (
 Inventorimakasih/
 ├── public/
 │   ├── index.php
+│   ├── router.php
 │   ├── .htaccess
 │   └── assets/
 │       ├── css/style.css
@@ -106,14 +118,18 @@ Inventorimakasih/
 │   │   ├── layouts/
 │   │   │   ├── header.php
 │   │   │   └── footer.php
+│   │   ├── errors/
+│   │   │   └── error.php
 │   │   ├── barang/
 │   │   │   ├── index.php
 │   │   │   ├── create.php
-│   │   │   └── edit.php
+│   │   │   ├── edit.php
+│   │   │   └── _form.php
 │   │   └── kategori/
 │   │       ├── index.php
 │   │       ├── create.php
-│   │       └── edit.php
+│   │       ├── edit.php
+│   │       └── _form.php
 │   └── Core/
 │       ├── Router.php
 │       ├── Database.php
@@ -123,7 +139,8 @@ Inventorimakasih/
 │   └── database.php
 │
 ├── database/
-│   └── Inventorimakasih.sql
+│   ├── Inventorimakasih.sql
+│   └── seed_demo.sql
 │
 ├── .gitignore
 └── README.md
@@ -201,4 +218,10 @@ Inventorimakasih/
 
 ---
 
-Mau saya buatkan juga **contoh kode skeleton** (Router, Database, Base Controller, contoh KategoriController) supaya langsung bisa mulai coding?
+### 11. Riwayat Versi
+
+| Versi | Tanggal | Perubahan |
+|-------|---------|-----------|
+| 1.0 | — | PRD awal, pembagian tugas 2 orang |
+| 1.1 | 30 Okt 2026 | Penyesuaian PRD + struktur folder + pembagian tugas untuk 2 orang |
+| 1.2 | 31 Okt 2026 | Implementasi selesai & di-merge: PR #1 (setup MVC), PR #2 (kategori CRUD), PR #3 (barang CRUD + UI + export CSV), PR #4 (hardening: CSRF, escape wildcard LIKE, dedup, harga koma desimal, fputcsv eksplisit) |

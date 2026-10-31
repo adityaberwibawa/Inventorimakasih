@@ -15,6 +15,8 @@ Sistem manajemen inventaris barang berbasis **PHP MVC** untuk mengelola kategori
 - Export CSV sesuai filter aktif
 - Flash message sukses/error
 - Validasi input di controller
+- Proteksi CSRF pada semua form POST
+- Input harga menerima koma desimal (`15,5` → `15.50`)
 - Layout responsif dengan Tailwind CSS
 
 ## Teknologi
@@ -208,7 +210,7 @@ Relasi `barang.kategori_id` memakai `ON DELETE RESTRICT`, sehingga kategori yang
 | `nama` | Wajib, maksimal 150 karakter |
 | `kategori_id` | Wajib, integer >= 1, harus ada di tabel kategori |
 | `stok` | Wajib, bilangan bulat 0–1.000.000 |
-| `harga` | Wajib, angka 0–9.999.999.999,99 |
+| `harga` | Wajib, angka 0–9.999.999.999,99. Koma desimal diterima: `15,5` disimpan sebagai `15.50` |
 | `deskripsi` | Opsional, maksimal 5.000 karakter |
 
 ### Kategori
@@ -249,6 +251,8 @@ Jika validasi gagal, form ditampilkan kembali dengan pesan error per field dan i
 - [ ] Tambah kategori baru, lalu pastikan muncul di dropdown barang.
 - [ ] Export CSV dan buka di Excel.
 - [ ] Coba hapus kategori yang masih memiliki barang (harus ditolak).
+- [ ] Tambah barang dengan harga pakai koma (`15,5`) — tersimpan sebagai `15.50`.
+- [ ] Tunjukkan proteksi CSRF: kirim POST tanpa token → halaman 419.
 - [ ] Buka tampilan mobile.
 
 ## Troubleshooting
@@ -286,13 +290,15 @@ Jika kategori masih memiliki barang, database menolak penghapusan karena foreign
 
 - Semua query menggunakan PDO prepared statement.
 - Output di-escape dengan `e()` untuk mencegah XSS.
+- Semua form POST menyertakan token CSRF (`csrf_input()`); POST tanpa token valid ditolak dengan HTTP 419.
+- Pencarian meng-escape wildcard LIKE (`%`, `_`) agar dicari sebagai teks literal.
 - Sort column dan arah dibatasi dengan whitelist.
 - Export CSV menetralkan sel yang diawali karakter formula (`=`, `+`, `-`, `@`).
 - Aplikasi ini belum memiliki autentikasi/otorisasi karena di luar cakupan tugas.
 
 ## Pembagian Tugas
 
-- **Anggota A** — foundation MVC, database, router, base controller/model, CRUD kategori, validasi dasar, layout.
+- **Anggota A** — foundation MVC, database, router, base controller/model, CRUD kategori, validasi dasar, layout; review PR & hardening (proteksi CSRF, escape wildcard pencarian, dedup kode, normalisasi harga koma desimal).
 - **Anggota B** — CRUD barang, validasi barang, flash message, summary cards, pencarian/filter/pagination, badge stok, export CSV, responsive UI, README.
 
 ## Lisensi
