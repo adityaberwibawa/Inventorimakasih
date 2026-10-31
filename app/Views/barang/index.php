@@ -234,7 +234,7 @@ $endNumber = $startNumber + count($barang) - 1;
                             <td class="px-4 py-4 text-slate-500"><?= (int) $startNumber + $index ?></td>
                             <td class="px-4 py-4">
                                 <span class="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs font-semibold text-slate-600">
-                                    BRG-<?= str_pad((string) (int) $item['id'], 4, '0', STR_PAD_LEFT) ?>
+                                    <?= kode_barang($item['id']) ?>
                                 </span>
                             </td>
                             <td class="px-4 py-4">
@@ -289,7 +289,7 @@ $endNumber = $startNumber + count($barang) - 1;
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="font-mono text-[11px] font-semibold text-slate-400">
-                                BRG-<?= str_pad((string) (int) $item['id'], 4, '0', STR_PAD_LEFT) ?>
+                                <?= kode_barang($item['id']) ?>
                             </p>
                             <h2 class="mt-0.5 truncate font-semibold text-slate-900"><?= e($item['nama']) ?></h2>
                             <p class="mt-0.5 text-xs text-slate-500"><?= e($item['kategori_nama']) ?></p>

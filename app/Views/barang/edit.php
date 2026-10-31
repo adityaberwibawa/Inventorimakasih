@@ -15,7 +15,7 @@
 <div class="max-w-3xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
     <p class="mb-5 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">
         Kode
-        <span class="font-mono font-semibold text-slate-800">BRG-<?= str_pad((string) (int) $barang['id'], 4, '0', STR_PAD_LEFT) ?></span>
+        <span class="font-mono font-semibold text-slate-800"><?= kode_barang($barang['id']) ?></span>
         &middot; Dibuat pada <?= e(date('d/m/Y H:i', strtotime((string) $barang['created_at']))) ?>
     </p>
 

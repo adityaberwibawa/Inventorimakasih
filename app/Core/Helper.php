@@ -101,6 +101,16 @@ if (!function_exists('rupiah')) {
     }
 }
 
+if (!function_exists('kode_barang')) {
+    /**
+     * Format kode barang, misal "BRG-0001".
+     */
+    function kode_barang(int|string $id): string
+    {
+        return 'BRG-' . str_pad((string) (int) $id, 4, '0', STR_PAD_LEFT);
+    }
+}
+
 if (!function_exists('csrf_token')) {
     /**
      * Ambil (atau buat) token CSRF untuk sesi saat ini.

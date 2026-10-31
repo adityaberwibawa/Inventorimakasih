@@ -144,12 +144,12 @@ final class BarangController extends Controller
         }
 
         fwrite($output, "\xEF\xBB\xBF");
-        fputcsv($output, ['ID', 'Kode', 'Nama', 'Kategori', 'Stok', 'Harga', 'Nilai', 'Deskripsi', 'Dibuat'], ';');
+        fputcsv($output, ['ID', 'Kode', 'Nama', 'Kategori', 'Stok', 'Harga', 'Nilai', 'Deskripsi', 'Dibuat'], ';', '"', '\\');
 
         foreach ($rows as $row) {
             fputcsv($output, [
                 (int) $row['id'],
-                sprintf('BRG-%04d', (int) $row['id']),
+                kode_barang((int) $row['id']),
                 $this->csvValue($row['nama']),
                 $this->csvValue($row['kategori_nama']),
                 (int) $row['stok'],
@@ -157,7 +157,7 @@ final class BarangController extends Controller
                 (float) $row['stok'] * (float) $row['harga'],
                 $this->csvValue($row['deskripsi'] ?? ''),
                 (string) $row['created_at'],
-            ], ';');
+            ], ';', '"', '\\');
         }
 
         fclose($output);
