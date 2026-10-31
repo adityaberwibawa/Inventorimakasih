@@ -115,21 +115,12 @@ final class Barang extends Model
         $page = min(max(1, $page), $totalPages);
         $offset = ($page - 1) * $perPage;
 
-        $sortMap = [
-            'created_at' => 'b.created_at',
-            'nama' => 'b.nama',
-            'stok' => 'b.stok',
-            'harga' => 'b.harga',
-        ];
-        $orderBy = $sortMap[$filters['sort']] ?? 'b.created_at';
-        $direction = $filters['dir'] === 'ASC' ? 'ASC' : 'DESC';
-
         $sql = 'SELECT b.id, b.nama, b.kategori_id, b.stok, b.harga, b.deskripsi, b.created_at,
                        k.nama AS kategori_nama
                 FROM barang b
                 INNER JOIN kategori k ON k.id = b.kategori_id'
             . $whereSql
-            . ' ORDER BY ' . $orderBy . ' ' . $direction . ', b.id DESC'
+            . ' ORDER BY ' . $this->orderByClause($filters)
             . ' LIMIT :limit OFFSET :offset';
 
         $statement = $this->db->prepare($sql);
@@ -185,22 +176,13 @@ final class Barang extends Model
     {
         [$whereSql, $params] = $this->buildFilter($filters);
 
-        $sortMap = [
-            'created_at' => 'b.created_at',
-            'nama' => 'b.nama',
-            'stok' => 'b.stok',
-            'harga' => 'b.harga',
-        ];
-        $orderBy = $sortMap[$filters['sort']] ?? 'b.created_at';
-        $direction = $filters['dir'] === 'ASC' ? 'ASC' : 'DESC';
-
         return $this->fetchAll(
             'SELECT b.id, b.nama, b.kategori_id, b.stok, b.harga, b.deskripsi, b.created_at,
                     k.nama AS kategori_nama
              FROM barang b
              INNER JOIN kategori k ON k.id = b.kategori_id'
             . $whereSql
-            . ' ORDER BY ' . $orderBy . ' ' . $direction . ', b.id DESC',
+            . ' ORDER BY ' . $this->orderByClause($filters),
             $params
         );
     }
@@ -215,7 +197,9 @@ final class Barang extends Model
         $params = [];
 
         if ($filters['q'] !== '') {
-            $like = '%' . $filters['q'] . '%';
+            // Escape karakter wildcard LIKE agar dicari sebagai teks biasa.
+            $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $filters['q']);
+            $like = '%' . $escaped . '%';
             $where[] = '(b.nama LIKE :q_nama OR b.deskripsi LIKE :q_deskripsi OR k.nama LIKE :q_kategori)';
             $params['q_nama'] = $like;
             $params['q_deskripsi'] = $like;
@@ -246,5 +230,24 @@ final class Barang extends Model
             $where === [] ? '' : ' WHERE ' . implode(' AND ', $where),
             $params,
         ];
+    }
+
+    /**
+     * Bangun klausa ORDER BY dari filter yang sudah melalui whitelist di controller.
+     *
+     * @param array{q: string, kategori: int|null, status: string, sort: string, dir: string} $filters
+     */
+    private function orderByClause(array $filters): string
+    {
+        $sortMap = [
+            'created_at' => 'b.created_at',
+            'nama' => 'b.nama',
+            'stok' => 'b.stok',
+            'harga' => 'b.harga',
+        ];
+        $orderBy = $sortMap[$filters['sort']] ?? 'b.created_at';
+        $direction = $filters['dir'] === 'ASC' ? 'ASC' : 'DESC';
+
+        return $orderBy . ' ' . $direction . ', b.id DESC';
     }
 }

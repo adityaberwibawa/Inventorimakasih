@@ -234,7 +234,7 @@ $endNumber = $startNumber + count($barang) - 1;
                             <td class="px-4 py-4 text-slate-500"><?= (int) $startNumber + $index ?></td>
                             <td class="px-4 py-4">
                                 <span class="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs font-semibold text-slate-600">
-                                    BRG-<?= str_pad((string) (int) $item['id'], 4, '0', STR_PAD_LEFT) ?>
+                                    <?= kode_barang($item['id']) ?>
                                 </span>
                             </td>
                             <td class="px-4 py-4">
@@ -264,6 +264,7 @@ $endNumber = $startNumber + count($barang) - 1;
                                     </a>
                                     <form action="<?= url('/barang/hapus') ?>" method="post"
                                           onsubmit="return confirm('Hapus barang ini? Tindakan ini tidak dapat dibatalkan.');">
+                                        <?= csrf_input() ?>
                                         <input type="hidden" name="id" value="<?= (int) $item['id'] ?>">
                                         <button type="submit"
                                                 class="rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-50">
@@ -288,7 +289,7 @@ $endNumber = $startNumber + count($barang) - 1;
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="font-mono text-[11px] font-semibold text-slate-400">
-                                BRG-<?= str_pad((string) (int) $item['id'], 4, '0', STR_PAD_LEFT) ?>
+                                <?= kode_barang($item['id']) ?>
                             </p>
                             <h2 class="mt-0.5 truncate font-semibold text-slate-900"><?= e($item['nama']) ?></h2>
                             <p class="mt-0.5 text-xs text-slate-500"><?= e($item['kategori_nama']) ?></p>
@@ -320,6 +321,7 @@ $endNumber = $startNumber + count($barang) - 1;
                         </a>
                         <form action="<?= url('/barang/hapus') ?>" method="post" class="flex-1"
                               onsubmit="return confirm('Hapus barang ini? Tindakan ini tidak dapat dibatalkan.');">
+                            <?= csrf_input() ?>
                             <input type="hidden" name="id" value="<?= (int) $item['id'] ?>">
                             <button type="submit"
                                     class="w-full rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50">

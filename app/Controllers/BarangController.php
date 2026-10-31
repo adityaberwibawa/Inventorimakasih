@@ -144,12 +144,12 @@ final class BarangController extends Controller
         }
 
         fwrite($output, "\xEF\xBB\xBF");
-        fputcsv($output, ['ID', 'Kode', 'Nama', 'Kategori', 'Stok', 'Harga', 'Nilai', 'Deskripsi', 'Dibuat'], ';');
+        fputcsv($output, ['ID', 'Kode', 'Nama', 'Kategori', 'Stok', 'Harga', 'Nilai', 'Deskripsi', 'Dibuat'], ';', '"', '\\');
 
         foreach ($rows as $row) {
             fputcsv($output, [
                 (int) $row['id'],
-                sprintf('BRG-%04d', (int) $row['id']),
+                kode_barang((int) $row['id']),
                 $this->csvValue($row['nama']),
                 $this->csvValue($row['kategori_nama']),
                 (int) $row['stok'],
@@ -157,7 +157,7 @@ final class BarangController extends Controller
                 (float) $row['stok'] * (float) $row['harga'],
                 $this->csvValue($row['deskripsi'] ?? ''),
                 (string) $row['created_at'],
-            ], ';');
+            ], ';', '"', '\\');
         }
 
         fclose($output);
@@ -173,7 +173,9 @@ final class BarangController extends Controller
             'nama' => $this->postString('nama'),
             'kategori_id' => $this->postString('kategori_id'),
             'stok' => $this->postString('stok'),
-            'harga' => $this->postString('harga'),
+            // Terima koma desimal ("15,5") dan kanoniskan ke titik sebelum divalidasi,
+            // sekaligus memastikan tidak ada koma yang lolos ke kolom DECIMAL.
+            'harga' => str_replace(',', '.', $this->postString('harga')),
             'deskripsi' => $this->postString('deskripsi'),
         ];
     }

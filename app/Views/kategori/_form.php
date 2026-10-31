@@ -8,6 +8,7 @@ $namaError = $errors['nama'] ?? null;
 $deskripsiError = $errors['deskripsi'] ?? null;
 ?>
 <form action="<?= e($formAction) ?>" method="post" class="space-y-5" novalidate>
+    <?= csrf_input() ?>
     <?php if (isset($old['id'])): ?>
         <input type="hidden" name="id" value="<?= (int) $old['id'] ?>">
     <?php endif; ?>
