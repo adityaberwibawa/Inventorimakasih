@@ -173,7 +173,9 @@ final class BarangController extends Controller
             'nama' => $this->postString('nama'),
             'kategori_id' => $this->postString('kategori_id'),
             'stok' => $this->postString('stok'),
-            'harga' => $this->postString('harga'),
+            // Terima koma desimal ("15,5") dan kanoniskan ke titik sebelum divalidasi,
+            // sekaligus memastikan tidak ada koma yang lolos ke kolom DECIMAL.
+            'harga' => str_replace(',', '.', $this->postString('harga')),
             'deskripsi' => $this->postString('deskripsi'),
         ];
     }
@@ -218,9 +220,7 @@ final class BarangController extends Controller
             'nama' => $data['nama'],
             'kategori_id' => (int) $data['kategori_id'],
             'stok' => (int) $data['stok'],
-            // FILTER_VALIDATE_FLOAT menerima "1,5" (koma desimal),
-            // sedangkan MySQL strict mode menolaknya pada kolom DECIMAL.
-            'harga' => str_replace(',', '.', $data['harga']),
+            'harga' => $data['harga'],
             'deskripsi' => $data['deskripsi'],
         ];
     }
