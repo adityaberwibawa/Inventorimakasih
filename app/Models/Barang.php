@@ -215,7 +215,9 @@ final class Barang extends Model
         $params = [];
 
         if ($filters['q'] !== '') {
-            $like = '%' . $filters['q'] . '%';
+            // Escape karakter wildcard LIKE agar dicari sebagai teks biasa.
+            $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $filters['q']);
+            $like = '%' . $escaped . '%';
             $where[] = '(b.nama LIKE :q_nama OR b.deskripsi LIKE :q_deskripsi OR k.nama LIKE :q_kategori)';
             $params['q_nama'] = $like;
             $params['q_deskripsi'] = $like;

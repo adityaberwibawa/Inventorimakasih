@@ -218,7 +218,9 @@ final class BarangController extends Controller
             'nama' => $data['nama'],
             'kategori_id' => (int) $data['kategori_id'],
             'stok' => (int) $data['stok'],
-            'harga' => $data['harga'],
+            // FILTER_VALIDATE_FLOAT menerima "1,5" (koma desimal),
+            // sedangkan MySQL strict mode menolaknya pada kolom DECIMAL.
+            'harga' => str_replace(',', '.', $data['harga']),
             'deskripsi' => $data['deskripsi'],
         ];
     }
