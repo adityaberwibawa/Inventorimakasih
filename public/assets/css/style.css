@@ -1,0 +1,9 @@
+:root {
+    color-scheme: light;
+}
+
+body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Tailwind menangani sebagian besar styling. Tambahan kecil diletakkan di sini. */
