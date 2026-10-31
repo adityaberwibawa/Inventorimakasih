@@ -59,4 +59,6 @@ $router->get('/kategori/edit/{id}', [KategoriController::class, 'edit']);
 $router->post('/kategori/update', [KategoriController::class, 'update']);
 $router->post('/kategori/hapus', [KategoriController::class, 'destroy']);
 
+csrf_verify();
+
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');

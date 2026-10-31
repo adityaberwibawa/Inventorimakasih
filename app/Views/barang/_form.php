@@ -21,6 +21,7 @@ $tanpaKategori = $kategori === [];
 <?php endif; ?>
 
 <form action="<?= e($formAction) ?>" method="post" class="space-y-5" novalidate data-submit-loading>
+    <?= csrf_input() ?>
     <?php if (isset($old['id'])): ?>
         <input type="hidden" name="id" value="<?= (int) $old['id'] ?>">
     <?php endif; ?>

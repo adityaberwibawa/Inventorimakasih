@@ -264,6 +264,7 @@ $endNumber = $startNumber + count($barang) - 1;
                                     </a>
                                     <form action="<?= url('/barang/hapus') ?>" method="post"
                                           onsubmit="return confirm('Hapus barang ini? Tindakan ini tidak dapat dibatalkan.');">
+                                        <?= csrf_input() ?>
                                         <input type="hidden" name="id" value="<?= (int) $item['id'] ?>">
                                         <button type="submit"
                                                 class="rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-50">
@@ -320,6 +321,7 @@ $endNumber = $startNumber + count($barang) - 1;
                         </a>
                         <form action="<?= url('/barang/hapus') ?>" method="post" class="flex-1"
                               onsubmit="return confirm('Hapus barang ini? Tindakan ini tidak dapat dibatalkan.');">
+                            <?= csrf_input() ?>
                             <input type="hidden" name="id" value="<?= (int) $item['id'] ?>">
                             <button type="submit"
                                     class="w-full rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50">

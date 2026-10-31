@@ -1,11 +1,12 @@
 <?php
 /** @var int $code */
+/** @var string $title */
 /** @var string $message */
 ?>
 <div class="mx-auto max-w-xl rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
     <p class="text-5xl font-black text-indigo-600"><?= (int) $code ?></p>
     <h1 class="mt-3 text-xl font-bold text-slate-900">
-        <?= $code === 404 ? 'Halaman Tidak Ditemukan' : 'Terjadi Kesalahan' ?>
+        <?= $title ?? ($code === 404 ? 'Halaman Tidak Ditemukan' : 'Terjadi Kesalahan') ?>
     </h1>
     <p class="mt-2 text-sm leading-relaxed text-slate-600"><?= e($message) ?></p>
 
